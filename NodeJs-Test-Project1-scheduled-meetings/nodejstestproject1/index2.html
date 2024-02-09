@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>library Mangement </title>
+    <style>
+      .grid-container {
+  display: grid;
+  grid-template-rows:auto auto auto;
+  grid-gap: 5px;
+  background-color: #ffffffe8; 
+  padding: 3px;
+}
+
+.card-container{
+  width: 100%;
+  margin: 7rem auto;
+  display:grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 3rem;
+}
+.card{
+  padding: 2rem;
+  box-shadow: 0 0 .4rem .4rem rgba(0,0,0,0.2);
+  transition:.4s ease-in;
+}
+.card:hover{
+  background:rgb(rgb(104, 96, 106), green, rgb(184, 184, 196))
+}
+   
+  
+    </style>
+</head>
+
+<body>
+    <div class="grid-container">
+        <div class="books">
+           
+                <h2>Books</h2><br>
+                  <form onsubmit="createBook(event)">
+                    <label for="bookname">Enter the book name to order:</label><br>
+                    <input type="text" name="bookname" id="bookname">
+                    <input type="submit" value="submit">
+                </form>
+            
+        </div>
+        <div class="booksbooked">
+            <div class="card-container">
+
+            </div>
+
+        </div>
+        <div class="returnedbooks">
+
+
+        </div>
+    </div>
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', async ()=>{
+    try{
+     const bookdata=await axios.get('http://localhost:3000/getbookdata')
+      
+     for (let i = 0; i < bookdata.data.length; i++) {
+          
+           displaybooks(bookdata.data[i]);
+       }
+      }
+      catch(err){
+        console.log(err)
+      }
+     })
+  
+           function createBook(event){
+            event.preventDefault();
+            const bookedtime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+
+                   console.log('IST Date and Time:', bookedtime);
+
+                   let returndate=bookedtime;
+                   let fine=0;
+
+        const book={
+            bookname:event.target.bookname.value,
+           
+            bookedtime:bookedtime,
+            returndate:returndate,
+            fine:fine
+
+        }
+      //  dispalybooks(book);
+         try{
+            axios.post('http://localhost:3000/postbookdata',book)
+            .then(book=>{
+                console.log(book.data);
+                displaybooks(book.data);
+            })
+            .catch(err=>console.log(err))
+         }
+         catch(err){
+            console.log(err)
+         }
+            
+           }
+
+
+        
+
+function displaybooks(book){
+    console.log(book)
+    let booksbooked=document.querySelector('.booksbooked')
+  
+    let cardcontainer=document.querySelector('.card-container');
+
+    let card=document.createElement('div');
+             card.classList.add('card')
+             card.setAttribute('id',book.id)
+             card.innerHTML=`<li id="${book.id}>Book Name:${book.bookname} <br>
+                 Book Taken On:${book.bookedtime} <br>
+                 Book return date:${book.returndate} <br> Current fine:${book.fine} <br>
+                 <button onClick=returnBook('${book.id}')>Return Book</button></li>`
+             
+                 cardcontainer.appendChild(card); 
+                 booksbooked.append(cardcontainer)
+
+
+    let returnedbooks=document.querySelector('.returnedbooks')
+    let returnheader=document.createElement('li');
+    returnheader.innerText='returned books'
+    returnedbooks.appendChild(returnheader)
+    let ul=document.createElement('ul');
+     //let li=document.createElement('li');
+       ul.innerHTML=`<li ">Book Name:${book.bookname} <br>
+        fine:${book.fine} <br>
+        Returned on:${book.bookedtime}</li>`
+        returnedbooks.appendChild(ul)
+
+
+}
+
+function returnBook(bookId){
+    // let booksbooked=document.querySelector('.booksbooked')
+      
+    // const container=document.querySelector('.card-container')
+    //     const returnbook=document.getElementById(`${bookId}`)
+    //       container.removeChild(returnbook);
+    //       booksbooked.removeChild(container);
+          
+    try{
+
+      axios.delete(`http://localhost:3000/return-book/${id}`)
+      
+    }
+    catch(err){
+      console.log(err)
+    }
+}
+    </script>
+</body>
+</html>

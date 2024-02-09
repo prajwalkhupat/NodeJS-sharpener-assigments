@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>scheduled </title>
+</head>
+<style>
+
+
+.del-btn:hover{
+  background-color: #9999ed;
+}
+ .main {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap:1rem;
+}
+  .btn {
+  display: inline-block;
+  padding: 0.25rem 1rem;
+  text-decoration: none;
+  font: inherit;
+  border: 1px solid #00695c;
+  color: #00695c;
+  background: white;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.btn:hover,
+.btn:active {
+  background-color: #00695c;
+  color: white;
+}
+.divform{
+  display: none;
+  max-width: 250px; /* Set a maximum width for the form */
+            margin:auto;
+            padding: 20px;
+            border: 1px solid #cccccc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-container{
+  width: 60%;
+  margin: 10rem auto;
+  display:grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 3rem;
+}
+.card{
+  padding: 2rem;
+  box-shadow: 0 0 .4rem .4rem rgba(0,0,0,0.2);
+  transition:.4s ease-in;
+}
+.card:hover{
+  background:rgb(rgb(104, 96, 106), green, rgb(184, 184, 196))
+}
+.button{
+  width: 20%;
+ 
+}
+
+    
+</style>
+<body>
+  <div class="main">
+    <div class="button">
+      <button onClick="goToForm(this.id)" class='btn' id="2:00">2:00PM<br><span id="btn2:00">4</span><span> available</span></button> <br><br>
+      <button onClick="goToForm(this.id)" class='btn' id="2:30">2:30PM<br><span id="btn2:30">4</span> available</span></button> <br><br>
+      <button onClick="goToForm(this.id)" class='btn' id="3:00">3:00PM<br><span id="btn3:00">4 </span> available</span></button> <br><br>
+      <button onClick="goToForm(this.id)" class='btn' id="3:30">3:30PM<br><span id="btn3:30">4</span> available</span></button> <br><br>
+    </div>
+
+   
+      <div class="divform">
+        <form id="myForm" onsubmit="addScheduled(event); return false;">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <br><br>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <br><br>
+            <input type="hidden" name="productId" id="productId">
+            <input type="submit" value="Add">
+        </form>
+      </div>
+   
+    </div>
+    <div class="scheduled meetings">
+         <main>
+           <h3 style="text-align: center;">scheduled meetings</h3>
+         </main>
+
+    </div>
+    <div class="pop-container">
+              
+
+
+    </div>
+
+      <div class="card-container">
+             
+           
+       
+      </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', async ()=>{
+    try{
+     const slotdata=await axios.get('http://localhost:3000/getslotdata')
+      
+     for (let i = 0; i < slotdata.data.length; i++) {
+          
+           displayslots(slotdata.data[i]);
+       }
+      }
+      catch(err){
+        console.log(err)
+      }
+     })
+    
+
+    function goToForm(btnid){
+        document.getElementById('productId').value=btnid;
+
+         console.log(btnid)
+        let  divform=document.querySelector('.divform')
+
+        divform.style.display='block';
+
+    }
+    function addScheduled(event){
+      event.preventDefault();
+      const form=document.getElementById('myForm');
+      //form.reset();
+      
+      const time=event.target.productId.value;
+      
+         let slot=document.getElementById(`btn${time}`);
+         let  slotText=slot.innerText;
+         if(slotText>0){
+         slot.innerText=slotText-1;
+       }
+       else{
+           let button=document.getElementById(`${time}`)
+           console.log(button)
+           button.style.display='none';
+       }
+        
+      
+       const obj={
+           name:event.target.name.value,
+           email:event.target.email.value,
+           time:event.target.productId.value,
+           slot:slot.innerText  
+       }
+      
+      //  if(slotText>=1){
+      //    slot.innerText=obj.slot-1;
+      //  }
+      //  else{
+      //      let button=document.getElementById(`${obj.time}`)
+      //      console.log(button)
+      //      button.style.display='none';
+      //  }
+      //   console.log(event.target.id);
+        let  divform=document.querySelector('.divform')
+
+              divform.style.display='none';
+        try{
+
+        axios.post('http://localhost:3000/add-slot',obj)
+        .then(response=>{
+          console.log(response);
+          displayslots(response.data);
+          form.reset();
+        }) 
+        //form.reset();
+      }
+      catch(err){
+        console.log(err)
+      }
+
+        
+      
+    }
+
+    function displayslots(data){
+      let slot=document.getElementById(`btn${data.time}`);
+      if(data.slot>=1){
+       
+         slot.innerText=data.slot
+         console.log(slot.innerText)
+       }
+       else{
+           
+           let button=document.getElementById(`${data.time}`)
+           console.log(button)
+           slot.innerText=data.slot;
+           console.log(slot.innerText)
+           button.style.display='none';
+       }
+
+            let card=document.createElement('div');
+             card.classList.add('card')
+             card.setAttribute('id',data.email)
+             card.innerHTML=`<li id=${data.time}> Hi ${data.name} <br><br> please join via this link <br> <a href=https://meet.google.com/hrc-vrbq-dci>https://meet.google.com/hrc-vrbq-dci</a><br> 
+              at ${data.time}PM <button class="del-btn" onClick=deleteSlot('${data.slot}','${data.time}','${data.email}') >Cancel</button>`
+              const container=document.querySelector('.card-container')
+                 container.append(card); 
+    }
+    function deleteSlot(slot,time,email){
+     let id=email;
+      // let slot2=document.getElementById(`btn${time}`);
+      // console.log(slot);
+      // slot2.innerText=parseInt(slot2.innerText)+1;
+      // console.log(slot2)
+
+      let slot2=document.getElementById(`btn${time}`)
+     
+        
+      //console.log('slot2vakue',slot2value)
+      slot2.innerText=parseInt(slot2.innerText)+1;
+      let  slot2value=slot2.innerText;
+      console.log(slot2value);
+      if(slot2value>0){
+        let button=document.getElementById(`${time}`)
+           console.log(button)
+           slot2.innerText=slot2value;
+           button.style.display='block';
+      }
+
+
+      
+      const container=document.querySelector('.card-container')
+        const deleteSlot=document.getElementById(`${email}`)
+          container.removeChild(deleteSlot);
+    try{
+
+      axios.delete(`http://localhost:3000/delete-slot/${id}`)
+      
+    }
+    catch(err){
+      console.log(err)
+    }
+      
+
+    }
+</script>
+</body>
+</html>
