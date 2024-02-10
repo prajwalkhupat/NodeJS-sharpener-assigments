@@ -10,9 +10,6 @@ const slotroute=require('./routes/slotTable');
 
 
 
-
-
-
 const path=require('path')
 const rootDir=require('./util/path');
 const cors=require('cors')
@@ -26,7 +23,7 @@ app.use(bookroute);
 
 
 sequelize.sync()
-.then(result=>{
+.then(() =>{
     app.listen(3000);
 });
 

@@ -1,5 +1,5 @@
 const { where } = require('sequelize');
-const SlotTable=require('../models/slottable');
+const slottable=require('../models/slottable');
 exports.AddSlot=(req,res,next)=>{
           
     const name= req.body.name;
@@ -12,7 +12,7 @@ exports.AddSlot=(req,res,next)=>{
     // }
     console.log(name,email,slot,time)
    
-    SlotTable.create({
+    slottable.create({
       name:name,
       email:email,
       slot:slot,
@@ -33,7 +33,7 @@ exports.AddSlot=(req,res,next)=>{
 }
 exports.getslotdata=(req,res,next)=>{
    
-   SlotTable.findAll()
+   slottable.findAll()
    .then(slotdata=>{
         res.json(slotdata);
    })
@@ -44,10 +44,10 @@ exports.getslotdata=(req,res,next)=>{
 exports.deleteSlot=(req,res,next)=>{
   let id=req.params.slotId;
   console.log(id);
-  SlotTable.findAll({where:{email:id}})
+  slottable.findAll({where:{email:id}})
   .then(product=>{
     if(product[0]){
-     console.log(product[0],'he;llo')
+     console.log(product[0],'hello')
       product[0].destroy()
      
     }

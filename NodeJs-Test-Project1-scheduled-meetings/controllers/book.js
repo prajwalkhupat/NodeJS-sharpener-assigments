@@ -1,8 +1,5 @@
 const Book=require('../models/book');
 
-
-
-
 exports.postBookData=(req,res,next)=>{
        
     const returndate=req.body.returndate;

@@ -2,7 +2,7 @@ const Sequelize=require('sequelize');
 
 const sequelize=require('../util/database');
 
-const SlotTable=sequelize.define('slotTable',{
+const slottable=sequelize.define('slottable',{
   id:{
     type:Sequelize.INTEGER,
     primaryKey: true,
@@ -22,4 +22,4 @@ const SlotTable=sequelize.define('slotTable',{
   time:Sequelize.STRING
 });
 
-module.exports=SlotTable;
+module.exports=slottable;
